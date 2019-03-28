@@ -10,6 +10,8 @@
 #include "disp_func.h"
 //#include "frames.h"
 #include "FSystem.h"
+#include "wifi.h"
+#include "globals.h"
 
 
 
@@ -28,12 +30,15 @@
 ///////////////////////////
 
 DisplayClass display;
-
+ConfigClass config;
 
 void setup() {
+  display.init();
+  config.init();
   display.showLogo();
   Serial.begin(9600);
-  FS_init();
+  
+  WiFi_init(config,display);
   
   
 

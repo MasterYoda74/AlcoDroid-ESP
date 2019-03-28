@@ -12,9 +12,11 @@ class DisplayClass {
     public:
     // Constructor
     DisplayClass();
-
+    void init();
     void clear();
     void showLogo();
+    void printToBar(String);
+
 };
 //void display_init(Adafruit_SSD1306 &d);
 #endif
