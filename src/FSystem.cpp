@@ -1,5 +1,6 @@
 #include "FSystem.h"
-#include <FS.h>
+#include "defines.h"
+
 #include <ArduinoJson.h>
 
 
@@ -8,7 +9,28 @@ ConfigClass::ConfigClass(){
 }
 
 void ConfigClass::makeNewConfig(){
-  configString = '{"config_version":"v03","wifiSSID":"","wifiPASS":"","APSSID":"AlcoDroid","APPASS":"12345678","isAP":true,"servoMAX": 100,"servoMIN": 7,"stepPerMl": 94,"feedback": 3,"startMl": 20,"ledbright": 60,"p_microstep": 32,"p_maxSpeed": 400,"p_accel": 3000}';
+  //configString = '{"config_version":"v03","wifiSSID":"","wifiPASS":"","APSSID":"AlcoDroid","APPASS":"12345678","isAP":true,"servoMAX": 100,"servoMIN": 7,"stepPerMl": 94,"feedback": 3,"startMl": 20,"ledbright": 60,"p_microstep": 32,"p_maxSpeed": 400,"p_accel": 3000}';
+  const size_t capacity = JSON_OBJECT_SIZE(15);
+  DynamicJsonDocument doc(capacity);
+
+  doc["config_version"] = CONFIG_VERSION;
+  doc["wifiSSID"]       = "";
+  doc["wifiPASS"]       = "";
+  doc["APSSID"]         = "AlcoDroid";
+  doc["APPASS"]         = "12345678";
+  doc["isAP"]           = true;
+  doc["servoMAX"]       = 100;
+  doc["servoMIN"]       = 7;
+  doc["stepPerMl"]      = 94;
+  doc["feedback"]       = 3;
+  doc["startMl"]        = 20;
+  doc["ledbright"]      = 60;
+  doc["p_microstep"]    = 32;
+  doc["p_maxSpeed"]     = 400;
+  doc["p_accel"]        = 3000;
+  configString ="";
+  serializeJson(doc, configString);
+  
   writeFile("config.json",configString);
 }
 
@@ -16,8 +38,20 @@ String ConfigClass::getConfigString() {
   return configString;
 }
 
+bool ConfigClass::setConfigString(String &json) {
+  configString = json;
+  writeFile("config.json", configString );
+  return true;
+}
+
 String ConfigClass::getShotsString() {
   return shotsString;
+}
+
+bool ConfigClass::setShotsString(String &json) {
+  shotsString = json;
+  writeFile("shots.json", shotsString );
+  return true;
 }
 
 String ConfigClass::getOldUsersString() {
@@ -28,8 +62,19 @@ String ConfigClass::getUsersString() {
   return usersString;
 }
 
+bool ConfigClass::setUsersString(String &json) {
+  usersString = json;
+  return true;
+}
+
 String ConfigClass::getWiFiString() {
   return wifiString;
+}
+
+bool ConfigClass::setWiFiString(String &json) {
+  wifiString = json;
+  writeFile("wifi.json", wifiString );
+  return true;
 }
 
 String ConfigClass::getVal(String param) {
@@ -55,13 +100,22 @@ WiFiSett ConfigClass::getWiFiSetting(int index){
   return set;
 }
 
+bool ConfigClass::setVal(String name, String val) {
+  jsonWrite(configString,name,val);
+  return true;
+}
+
+void ConfigClass::saveConfig() {
+  writeFile("/config.json", configString);
+}
+
 // Работа с файловой системой
 
 // FS init
 void ConfigClass::init() {
   SPIFFS.begin();
   configString = readFile("config.json", 4096);
-  if (configString == "Failed") makeNewConfig();
+  if (configString == "Failed" || jsonRead(configString,"config_version") != CONFIG_VERSION) makeNewConfig();
 }
 
 // ------------- Чтение файла в строку
@@ -91,6 +145,14 @@ String ConfigClass::writeFile(String fileName, String strings ) {
   configFile.close();
   return "Write sucsses";
 }
+
+// bool ConfigClass::isExistFile(String name) {
+//   return SPIFFS.exists(name);
+// }
+
+// File ConfigClass::getFile(String name) {
+//   return SPIFFS.open(name, "r");
+// }
 
 
 
@@ -149,7 +211,7 @@ String ConfigClass::jsonWriteBool(String &json, String name, bool volume) {
 String ConfigClass::findColor(String id){
   String jstr = readFile("shots.json", 2048);
   if (jstr == "Failed") {
-    jstr = "{shots:[]}";
+    jstr = "{\"shots\":[]}";
     writeFile("shots.json",jstr);
   }
   DynamicJsonDocument jsonBuffer(1024);
@@ -175,7 +237,7 @@ String ConfigClass::findColor(String id){
 String ConfigClass::findWiFiSetting(String _ssid) {
   String jstr = readFile("wifi.json", 2048);
   if (jstr == "Failed") {
-    jstr = "{wifi:[]}";
+    jstr = "{\"wifi\":[]}";
     writeFile("wifi.json",jstr);
   }
   DynamicJsonDocument jsonBuffer(1024);

@@ -23,9 +23,16 @@ void DisplayClass::showLogo() {
     display.print(VERSION);
     display.display();
 }
-
+void DisplayClass::printToBar(String str, int set, int total) {
+    display.fillRect(0,50,128,14,BLACK);
+    display.drawRoundRect(0,50,128,6,1,WHITE);
+    display.drawRect(2,52,(124/total)*set,2,WHITE);
+    display.setCursor(0,56);
+    display.print(str);
+    display.display();
+}
 void DisplayClass::printToBar(String str) {
-    display.fillRect(0,56,128,8,BLACK);
+    display.fillRect(0,50,128,14,BLACK);
     display.setCursor(0,56);
     display.print(str);
     display.display();

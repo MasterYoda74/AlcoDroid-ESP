@@ -11,10 +11,12 @@ WiFi_state WiFi_init(ConfigClass &config, DisplayClass &display){
         WiFi.mode(WIFI_STA);
         String _ssid = config.getVal("wifiSSID");
         String _password = config.getVal("wifiPASS");
-        if (connectToWiFi(_ssid,_password,display)) {
-            //connected
-            state.isAP=false;
-            return IS_STA;
+        if (_ssid.length() > 1) {
+            if (connectToWiFi(_ssid,_password,display)) {
+                //connected
+                state.isAP=false;
+                return IS_STA;
+            }
         } else {
             // not connected
             int n = WiFi.scanNetworks();
@@ -22,6 +24,11 @@ WiFi_state WiFi_init(ConfigClass &config, DisplayClass &display){
                 String _password = config.findWiFiSetting(WiFi.SSID(i));
                 if (_password.length()>6) {
                     if (connectToWiFi(WiFi.SSID(i), _password, display)) {
+                        if (WiFi.SSID(i) != config.getVal("wifiSSID")) {
+                            config.setVal("wifiSSID",WiFi.SSID(i));
+                            config.setVal("wifiPASS",_password);
+                            config.saveConfig();
+                        }
                         state.isAP=false;
                         return IS_STA;
                     }
@@ -52,11 +59,11 @@ bool connectToWiFi(String _ssid, String _pass, DisplayClass &display) {
     // Делаем проверку подключения до тех пор пока счетчик tries
     // не станет равен нулю или не получим подключение
         display.printToBar(_ssid);
-        String bar = _ssid;
+        int bar = tries;
         while (--tries && WiFi.status() != WL_CONNECTED)
         {
             delay(1000);
-            display.printToBar(bar += ".");
+            display.printToBar(_ssid, bar-tries, bar);
         }
         if (WiFi.status() != WL_CONNECTED)
         {

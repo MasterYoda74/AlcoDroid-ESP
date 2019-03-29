@@ -15,8 +15,8 @@ class DisplayClass {
     void init();
     void clear();
     void showLogo();
+    void printToBar(String, int, int);
     void printToBar(String);
-
 };
 //void display_init(Adafruit_SSD1306 &d);
 #endif

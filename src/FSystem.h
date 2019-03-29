@@ -2,13 +2,15 @@
 #define _FSYSTEM_H_
 
 #include <Arduino.h>
-    enum ConfStrings{
-        CONFIG,
-        WIFI,
-        USERS,
-        OLDUSERS,
-        SHOTS
-    };
+#include <FS.h>
+enum ConfStrings
+{
+    CONFIG,
+    WIFI,
+    USERS,
+    OLDUSERS,
+    SHOTS
+};
 struct WiFiSett {
     int id;
     String SSSID;
@@ -20,15 +22,24 @@ class ConfigClass {
     
     ConfigClass();
     String getConfigString();
+    bool   setConfigString(String &json);
     String getWiFiString();
+    bool   setWiFiString(String &json);
     String getUsersString();
+    bool   setUsersString(String &json);
     String getShotsString();
+    bool   setShotsString(String &json);
     String getOldUsersString();
     String getVal(String Param);
-    bool getValToBool(String Param);
+    bool   getValToBool(String Param);
+    bool   setVal(String,String);
+    void   saveConfig();
     WiFiSett getWiFiSetting(int index);
     String findWiFiSetting(String);
     void init();
+
+    //bool isExistFile(String);
+   // File getFile(String);
 
     private:
     String configString = "{}";
@@ -49,6 +60,7 @@ class ConfigClass {
     String jsonWrite(String &json, String name, int volume);
     String jsonWriteBool(String &json, String name, bool volume);
     String findColor(String id);
+
 
 };
 
