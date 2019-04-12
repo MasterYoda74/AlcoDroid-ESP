@@ -10,10 +10,12 @@ class LedsClass {
     public:
     LedsClass();
     void init();
+    void setBright(int);
+    void clear();
 
 
     private:
-    CRGB leds[NUM_LEDS];
+    CRGB leds[NUM_LEDS_IN];
 
 };
 

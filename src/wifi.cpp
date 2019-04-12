@@ -76,6 +76,8 @@ bool connectToWiFi(String _ssid, String _pass, DisplayClass &display) {
             display.printToBar(_ssid + " OK");
             delay(500);
             state.IPAddress = IpAddress2String(WiFi.localIP());
+            state.curSSID = _ssid;
+            state.curPass = _pass;
             return true;
         }
 }
@@ -94,6 +96,8 @@ bool StartAPMode(String _ssidAP, String _passwordAP) {
   // хронящихся в переменных _ssidAP _passwordAP
   WiFi.softAP(_ssidAP.c_str(), _passwordAP.c_str());
   state.IPAddress = IpAddress2String(apIP);
+  state.curSSID = _ssidAP;
+  state.curPass = _passwordAP;
   return true;
 }
 

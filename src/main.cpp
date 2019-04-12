@@ -6,6 +6,7 @@
 #include "defines.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include "utils.h"
 #include "disp_func.h"
 #include "FSystem.h"
 #include "wifi.h"
@@ -13,6 +14,8 @@
 #include "http_func.h"
 #include "leds.h"
 #include "buttons.h"
+#include "pump.h"
+#include "comm.h"
 
 
 
@@ -30,7 +33,7 @@
 //        PROTOTYPES     //
 ///////////////////////////
 
-//--Подключение хэндлеров на HTTP
+//Подключение хэндлеров на HTTP
 void http_on();
 
 DisplayClass display;
@@ -38,25 +41,48 @@ ConfigClass config;
 HttpClass server;
 LedsClass leds;
 
+
 void setup() {
   display.init();
   config.init();
   display.showLogo();
   Serial.begin(9600);
   WiFi_init(config,display);
+  delay(500);
   http_on();
-  server.init();
+  server.init(config);
   leds.init();
+  buttons_init();
+  pump_init(config.getValToInt("p_microstep"),config.getValToInt("p_accel"),LOW,config.getValToInt("p_maxSpeed"));
+  display.printToBar(utf8rus("Запуск системы..."));
+  startComm();
+  leds.clear();
+  leds.setBright(config.getValToInt("ledbright"));
+  display.printToBar(utf8rus("Система готова !"));
+  delay(500);
+  state.isPumped = false;
+  state.canFill  = false;
   
-
 }
 
 void loop() {
   server.HTTP.handleClient();
+  server.loop();  //WebSocket loop
+  buttons_check();
+}
+// Обработка события однократного нажатия
+void onClick(int id) {
   
 }
-
-//--Подключение хэндлеров на HTTP
+// Обработка события удержания
+void onHold(int id) {
+  
+}
+// Обработка события многократного нажатия
+void onRepeat(int id) {
+  
+}
+// Подключение хэндлеров на HTTP
 void http_on(){
     // -------------------Прокачка системы
   server.HTTP.on("/start", HTTP_GET, []() {

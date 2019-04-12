@@ -31,13 +31,15 @@ class ConfigClass {
     bool   setShotsString(String &json);
     String getOldUsersString();
     String getVal(String Param);
+    int    getValToInt(String Param);
     bool   getValToBool(String Param);
     bool   setVal(String,String);
     void   saveConfig();
     WiFiSett getWiFiSetting(int index);
     String findWiFiSetting(String);
     void init();
-
+    String jsonWrite(String &json, String name, String volume);
+    String jsonWrite(String &json, String name, int volume);
     //bool isExistFile(String);
    // File getFile(String);
 
@@ -56,8 +58,7 @@ class ConfigClass {
     String jsonRead(String &json, String name);
     int jsonReadtoInt(String &json, String name);
     bool jsonReadtoBool(String &json, String name);
-    String jsonWrite(String &json, String name, String volume);
-    String jsonWrite(String &json, String name, int volume);
+
     String jsonWriteBool(String &json, String name, bool volume);
     String findColor(String id);
 

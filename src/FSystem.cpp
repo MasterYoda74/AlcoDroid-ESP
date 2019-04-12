@@ -31,7 +31,7 @@ void ConfigClass::makeNewConfig(){
   configString ="";
   serializeJson(doc, configString);
   
-  writeFile("config.json",configString);
+  writeFile("config_" CONFIG_VERSION ".json",configString);
 }
 
 String ConfigClass::getConfigString() {
@@ -39,8 +39,8 @@ String ConfigClass::getConfigString() {
 }
 
 bool ConfigClass::setConfigString(String &json) {
-  configString = json;
-  writeFile("config.json", configString );
+  configString = json; 
+  writeFile("config_" CONFIG_VERSION ".json", configString );
   return true;
 }
 
@@ -80,7 +80,9 @@ bool ConfigClass::setWiFiString(String &json) {
 String ConfigClass::getVal(String param) {
   return jsonRead(configString, param);
 }
-
+int ConfigClass::getValToInt(String param) {
+  return jsonReadtoInt(configString, param);
+}
 bool ConfigClass::getValToBool(String param) {
   return jsonReadtoBool(configString, param);
 }
@@ -106,7 +108,7 @@ bool ConfigClass::setVal(String name, String val) {
 }
 
 void ConfigClass::saveConfig() {
-  writeFile("/config.json", configString);
+  writeFile("/config_" CONFIG_VERSION ".json", configString);
 }
 
 // Работа с файловой системой
@@ -114,7 +116,7 @@ void ConfigClass::saveConfig() {
 // FS init
 void ConfigClass::init() {
   SPIFFS.begin();
-  configString = readFile("config.json", 4096);
+  configString = readFile("config_" CONFIG_VERSION ".json", 4096);
   if (configString == "Failed" || jsonRead(configString,"config_version") != CONFIG_VERSION) makeNewConfig();
 }
 
